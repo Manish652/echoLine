@@ -10,7 +10,7 @@ function ChatHeader() {
   const isOnline = isAI ? true : selectedUser.isOnline;
 
   return (
-    <div className="px-4 py-3 border-b border-base-200 bg-base-100/95 backdrop-blur-sm sticky top-0 z-20 shadow-sm">
+    <div className="px-4 py-4 border-b border-base-300 bg-base-100 sticky top-0 z-20 shadow-sm">
       <div className="flex items-center justify-between">
         {/* User info section */}
         <div className="flex items-center gap-3 group">

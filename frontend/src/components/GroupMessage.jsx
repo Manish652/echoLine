@@ -1,6 +1,22 @@
 import { formatDistanceToNow } from 'date-fns';
 import { FiUser } from 'react-icons/fi';
 
+const COLORS = [
+  '#FF5252', '#FF4081', '#E040FB', '#7C4DFF', 
+  '#536DFE', '#448AFF', '#40C4FF', '#18FFFF', 
+  '#64FFDA', '#69F0AE', '#B2FF59', '#EEFF41', 
+  '#FFFF00', '#FFD740', '#FFAB40', '#FF6E40'
+];
+
+const getSenderColor = (id) => {
+  if (!id) return COLORS[0];
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = id.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return COLORS[Math.abs(hash) % COLORS.length];
+};
+
 const GroupMessage = ({ message, authUser }) => {
   const isOwn = message.senderId._id === authUser._id;
   const isSystem = message.messageType === 'system';
@@ -37,21 +53,24 @@ const GroupMessage = ({ message, authUser }) => {
 
         {/* Message Content */}
         <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
-          {/* Sender Name (for group messages) */}
-          {!isOwn && (
-            <span className="text-xs text-base-content/50 mb-1 px-1">
-              {message.senderId.fullName}
-            </span>
-          )}
-
           {/* Message Bubble */}
           <div
             className={`rounded-2xl px-4 py-2 ${
               isOwn
-                ? 'bg-primary text-primary-content rounded-br-sm'
-                : 'bg-base-200 text-base-content rounded-bl-sm'
+                ? 'bg-primary text-primary-content rounded-br-sm shadow-sm'
+                : 'bg-base-200 text-base-content rounded-bl-sm shadow-sm'
             }`}
           >
+            {/* Sender Name (WhatsApp style inside bubble) */}
+            {!isOwn && (
+              <div 
+                className="text-xs font-semibold mb-1 cursor-default" 
+                style={{ color: getSenderColor(message.senderId._id) }}
+              >
+                {message.senderId.fullName}
+              </div>
+            )}
+
             {/* Text Message */}
             {message.text && (
               <p className="text-sm whitespace-pre-wrap break-words">

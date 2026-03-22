@@ -43,7 +43,7 @@ const Sidebar = ({ isMobile, showBackButton, onBack }) => {
 
   return (
     <>
-      <aside className={`h-full ${selectedUser || selectedGroup ? 'hidden md:flex' : 'flex'} w-full md:w-80 bg-base-100 flex-col border-r border-base-300`}>
+      <aside className={`h-full ${selectedUser || selectedGroup ? 'hidden md:flex' : 'flex'} w-full md:w-80 lg:w-96 bg-base-200/50 flex-col border-r border-base-300 shrink-0`}>
         {/* Header */}
         <div className="p-4 border-b border-base-300">
           {/* Mobile Back Button */}
@@ -95,7 +95,6 @@ const Sidebar = ({ isMobile, showBackButton, onBack }) => {
             </button>
           </div>
 
-          {/* Search */}
           <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-base-content/50" />
             <Input
@@ -103,7 +102,7 @@ const Sidebar = ({ isMobile, showBackButton, onBack }) => {
               placeholder="Search conversations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-base-300/50 border-transparent focus:border-primary w-full shadow-sm"
             />
           </div>
 

@@ -2,7 +2,7 @@ import { Loader } from "lucide-react";
 import { useEffect } from 'react';
 import { Toaster } from "react-hot-toast";
 import { Navigate, Route, Routes } from 'react-router-dom';
-import NavBar from './components/NavBar';
+import SidebarNavigation from './components/SidebarNavigation';
 import { useAuth } from './context/AuthContext';
 import { useTheme } from './context/ThemeContext';
 import AboutPage from './pages/AboutPage.jsx';
@@ -33,9 +33,9 @@ function App() {
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
-      <div data-theme={theme}>
-        <NavBar />
-        <main className="min-h-screen pt-16">
+      <div data-theme={theme} className="flex h-screen overflow-hidden bg-base-100 text-base-content">
+        <SidebarNavigation />
+        <main className="flex-1 h-screen overflow-y-auto">
           <Routes>
             <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
             <Route path="/signup" element={!authUser ? <SignUppage /> : <Navigate to="/" />} />

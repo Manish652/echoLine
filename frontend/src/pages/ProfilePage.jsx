@@ -1,4 +1,4 @@
-import { Calendar, Camera, ChevronRight, Mail, Shield, User } from "lucide-react";
+import { Camera, Shield, Mail, Phone, Lock, Eye, MonitorSmartphone, Smartphone, CheckCircle2, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
@@ -8,32 +8,47 @@ import { uploadImage } from "../lib/uploadImage";
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuth();
   const [selectedImg, setSelectedImg] = useState(null);
+  const [formData, setFormData] = useState({
+    fullName: authUser?.fullName || "",
+    email: authUser?.email || ""
+  });
 
-  // Sync updated profile picture with state
   useEffect(() => {
     if (authUser?.profilepic) {
       setSelectedImg(getImageUrl(authUser.profilepic));
     }
+    if (authUser) {
+      setFormData({
+        fullName: authUser.fullName || "",
+        email: authUser.email || ""
+      });
+    }
   }, [authUser]);
+
+  const handleSaveChanges = async () => {
+    if (!formData.fullName.trim()) return toast.error("Full name is required");
+    if (!formData.email.trim()) return toast.error("Email is required");
+    try {
+      await updateProfile(formData);
+    } catch (error) {
+       // handled in context
+    }
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Check file size (5MB limit)
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-    if (file.size > maxSize) {
+    if (file.size > 5 * 1024 * 1024) {
       toast.error("Image size should be less than 5MB");
       return;
     }
 
-    // Check file type
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
     }
 
-    // Create preview
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
@@ -51,190 +66,215 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-200/50 to-base-100 pt-20 pb-12">
-      <div className="max-w-3xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-10 animate-fade-in">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Your Profile
-          </h1>
-          <p className="text-base-content/70 mt-2">
-            Manage your personal information
-          </p>
+    <div className="min-h-full bg-base-100 p-6 lg:p-10">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Top User Header Card */}
+        <div className="bg-base-200/50 border border-base-300 rounded-3xl p-8 mb-8 flex items-center gap-6">
+          <div className="relative group shrink-0">
+            <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-base-100 bg-base-300">
+              <img
+                src={selectedImg || "/avatar.png"}
+                alt="Profile"
+                className="w-full h-full object-cover"
+                onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${authUser?.fullName || 'User'}`}
+              />
+            </div>
+            <label
+              htmlFor="avatar-upload"
+              className={`
+                absolute bottom-1 right-1 
+                bg-primary hover:bg-primary-focus
+                p-2 rounded-full cursor-pointer shadow-lg
+                transition-all duration-200 transform
+                group-hover:scale-110 border-2 border-base-100
+                ${isUpdatingProfile ? "animate-pulse pointer-events-none opacity-70" : ""}
+              `}
+            >
+              <Camera className="w-4 h-4 text-primary-content" />
+              <input
+                type="file"
+                id="avatar-upload"
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={isUpdatingProfile}
+              />
+            </label>
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold mb-1">{authUser?.fullName || "User"}</h1>
+            <p className="text-base-content/60 text-sm flex items-center gap-2">
+              @{authUser?.fullName?.toLowerCase().replace(/\s+/g, '_') || "user"} • Engineering Lead
+            </p>
+          </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-[1fr,1.5fr]">
-          {/* Left Column - Avatar and Account Status */}
-          <div className="space-y-6">
-            {/* Avatar Card */}
-            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-200 overflow-hidden">
-              <div className="card-body items-center text-center p-6">
-                <div className="relative group">
-                  <div className="w-32 h-32 rounded-full overflow-hidden ring-4 ring-primary/20 ring-offset-2 ring-offset-base-100">
-                    <img
-                      src={selectedImg || "/avatar.png"}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                      onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${authUser?.fullName || 'User'}`}
-                    />
-                  </div>
-                  <label
-                    htmlFor="avatar-upload"
-                    className={`
-                      absolute bottom-0 right-0 
-                      bg-primary hover:bg-primary-focus
-                      p-3 rounded-full cursor-pointer shadow-lg
-                      transition-all duration-200 transform
-                      group-hover:scale-110
-                      ${isUpdatingProfile ? "animate-pulse pointer-events-none opacity-70" : ""}
-                    `}
-                  >
-                    <Camera className="w-5 h-5 text-primary-content" />
-                    <input
-                      type="file"
-                      id="avatar-upload"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={isUpdatingProfile}
-                    />
-                  </label>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* Left Column */}
+          <div className="space-y-8">
+            
+            {/* Profile Identity */}
+            <div>
+              <div className="flex items-center gap-2 mb-4 text-base-content/80">
+                <UserIcon /> 
+                <h2 className="text-lg font-bold">Profile Identity</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold tracking-wide text-base-content/60 uppercase">Full Name</label>
+                  <input 
+                    type="text"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    className="w-full bg-base-200/50 p-3 rounded-xl border border-base-300 focus:border-primary outline-none transition-colors font-medium text-sm"
+                    placeholder="Enter full name"
+                  />
                 </div>
-                <div className="mt-4">
-                  <h2 className="text-xl font-bold">{authUser?.fullName}</h2>
-                  <p className="text-base-content/60 text-sm mt-1">{authUser?.email}</p>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold tracking-wide text-base-content/60 uppercase">Email (Username)</label>
+                  <input 
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full bg-base-200/50 p-3 rounded-xl border border-base-300 focus:border-primary outline-none transition-colors font-medium text-sm text-primary"
+                    placeholder="Enter work email"
+                  />
                 </div>
-                <div className="w-full mt-4">
-                  <div className="bg-base-200/50 rounded-full px-4 py-2 text-sm flex items-center justify-center gap-2">
-                    <span className="inline-block w-2 h-2 bg-success rounded-full"></span>
-                    <span>Active Account</span>
-                  </div>
+              </div>
+              
+              <div className="mt-4 space-y-1">
+                <label className="text-xs font-semibold tracking-wide text-base-content/60 uppercase">Status Message</label>
+                <div className="bg-base-200/50 p-3 rounded-xl border border-base-300">
+                  <span className="font-medium text-sm">Optimizing the stream flow 🌊 | Engineering Workspace</span>
                 </div>
               </div>
             </div>
 
-            {/* Account Stats Card */}
-            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-200 overflow-hidden">
-              <div className="card-body p-6">
-                <h3 className="font-bold text-lg flex items-center gap-2 mb-4">
-                  <Shield className="w-5 h-5 text-primary" />
-                  Account Status
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-base-200/50">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-base-content/70" />
-                      <span>Member Since</span>
-                    </div>
-                    <span className="font-medium">{authUser?.createdAt?.split("T")[0] || "N/A"}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-base-200/50">
-                    <div className="flex items-center gap-3">
-                      <Shield className="w-4 h-4 text-base-content/70" />
-                      <span>Status</span>
-                    </div>
-                    <span className="font-medium text-success flex items-center gap-1">
-                      <span className="inline-block w-2 h-2 bg-success rounded-full"></span>
-                      Active
-                    </span>
-                  </div>
-                </div>
+            {/* Privacy & Access */}
+            <div>
+              <div className="flex items-center gap-2 mb-4 text-base-content/80 mt-10">
+                <Shield className="w-5 h-5 text-primary" /> 
+                <h2 className="text-lg font-bold">Privacy & Access</h2>
               </div>
-            </div>
-          </div>
-
-          {/* Right Column - Profile Information */}
-          <div className="space-y-6">
-            {/* Profile Info Card */}
-            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-200 overflow-hidden">
-              <div className="card-body p-6">
-                <h3 className="font-bold text-lg flex items-center gap-2 mb-6">
-                  <User className="w-5 h-5 text-primary" />
-                  Personal Information
-                </h3>
-
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-base-content/70 flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      Full Name
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <div className="bg-base-200 rounded-lg px-4 py-3 w-full border border-base-300 focus-within:border-primary transition-colors">
-                        <p className="font-medium">{authUser?.fullName || "Not provided"}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-base-content/70 flex items-center gap-2">
-                      <Mail className="w-4 h-4" />
-                      Email Address
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <div className="bg-base-200 rounded-lg px-4 py-3 w-full border border-base-300 focus-within:border-primary transition-colors">
-                        <p className="font-medium">{authUser?.email || "Not provided"}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-4 border-t border-base-200">
-                    <div className="space-y-4">
-                      <h4 className="text-sm font-medium text-base-content/70">Account Security</h4>
-                      <button className="btn btn-outline w-full justify-between">
-                        <span className="flex items-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                          </svg>
-                          Change Password
-                        </span>
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Verification Status */}
-            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-200 overflow-hidden">
-              <div className="card-body p-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-lg flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                    Verification Status
-                  </h3>
-                  <div className="badge badge-success gap-1">
-                    <span className="inline-block w-2 h-2 bg-success-content rounded-full"></span>
-                    Verified
-                  </div>
-                </div>
-
-                <div className="mt-4 bg-base-200/50 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="text-success mt-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+              <div className="space-y-3">
+                <div className="bg-base-200/50 p-4 rounded-xl border border-base-300 flex items-center justify-between cursor-pointer hover:bg-base-200 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-base-100 rounded-lg">
+                      <Lock className="w-5 h-5 text-base-content/70" />
                     </div>
                     <div>
-                      <h4 className="font-medium">Email Verified</h4>
-                      <p className="text-sm text-base-content/70 mt-1">
-                        Your email address has been successfully verified
-                      </p>
+                      <h4 className="font-medium text-sm">Change Password</h4>
+                      <p className="text-xs text-base-content/60 mt-0.5">Last updated 4 months ago</p>
                     </div>
+                  </div>
+                  <ChevronRightIcon />
+                </div>
+                
+                <div className="bg-base-200/50 p-4 rounded-xl border border-base-300 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-base-100 rounded-lg">
+                      <Eye className="w-5 h-5 text-base-content/70" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm">Profile Visibility</h4>
+                      <p className="text-xs text-base-content/60 mt-0.5">Visible to all workspace members</p>
+                    </div>
+                  </div>
+                  <input type="checkbox" className="toggle toggle-primary" defaultChecked />
+                </div>
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <button 
+                  onClick={handleSaveChanges} 
+                  disabled={isUpdatingProfile}
+                  className="btn btn-primary shadow-sm shadow-primary/20 text-primary-content px-6"
+                >
+                  {isUpdatingProfile ? "Saving..." : "Save Changes"}
+                </button>
+                <button 
+                  onClick={() => setFormData({ fullName: authUser?.fullName || "", email: authUser?.email || "" })}
+                  className="btn btn-ghost bg-base-200/50 border border-base-300 hover:bg-base-300"
+                >
+                  Discard
+                </button>
+              </div>
+            </div>
+            
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            
+            {/* Workspace Engagement */}
+            <div className="bg-base-200/30 p-6 rounded-2xl border border-base-300">
+              <h3 className="text-xs font-semibold tracking-wide text-base-content/60 uppercase mb-4">Workspace Engagement</h3>
+              <div className="flex items-end gap-3 mb-3">
+                <span className="text-4xl font-bold text-primary">1,284</span>
+                <span className="text-sm font-medium text-base-content/70 mb-1">Messages Sent</span>
+              </div>
+              <div className="w-full bg-base-300 rounded-full h-1.5 mt-2">
+                <div className="bg-primary h-1.5 rounded-full" style={{ width: '75%' }}></div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="bg-base-200/30 p-5 rounded-2xl border border-base-300">
+                <CheckCircle2 className="w-6 h-6 text-primary mb-3" />
+                <h3 className="font-bold text-lg mb-0.5">Pro</h3>
+                <p className="text-xs text-base-content/60">Account Type</p>
+              </div>
+              <div className="bg-base-200/30 p-5 rounded-2xl border border-base-300">
+                <Zap className="w-6 h-6 text-primary mb-3" />
+                <h3 className="font-bold text-lg mb-0.5">Top 5%</h3>
+                <p className="text-xs text-base-content/60">Contributors</p>
+              </div>
+            </div>
+
+            {/* Active Devices */}
+            <div className="bg-base-200/30 p-6 rounded-2xl border border-base-300 mt-6">
+              <h3 className="font-bold mb-4">Active Devices</h3>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <MonitorSmartphone className="w-6 h-6 text-base-content/50" />
+                  <div>
+                    <h4 className="text-sm font-medium">MacBook Pro 16"</h4>
+                    <p className="text-xs text-primary mt-0.5">Current Session</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Smartphone className="w-6 h-6 text-base-content/50" />
+                  <div>
+                    <h4 className="text-sm font-medium">iPhone 15 Pro</h4>
+                    <p className="text-xs text-base-content/60 mt-0.5">Last active 2h ago</p>
                   </div>
                 </div>
               </div>
+              <button className="w-full text-center text-xs font-medium text-error mt-6 hover:underline">
+                Logout of all devices
+              </button>
             </div>
+
           </div>
+
         </div>
       </div>
     </div>
   );
 };
+
+const UserIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+  </svg>
+);
+
+const ChevronRightIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-base-content/40">
+    <path d="m9 18 6-6-6-6"/>
+  </svg>
+);
 
 export default ProfilePage;

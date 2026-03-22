@@ -1,299 +1,243 @@
-import { MessageSquare, MoreVertical, Paperclip, Send, Smile } from "lucide-react";
-import { Input } from "../components/ui/input";
+import { Monitor, Moon, Sun, MonitorSmartphone, Bell, HardDrive, Trash2, Power } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
-const PREVIEW_MESSAGES = [
-  {
-    id: 1,
-    content: "Hey! How's it going?",
-    isSent: false,
-    time: "10:30 AM",
-    sender: {
-      name: "Manish",
-      avatar: "/avatar-1.png"
-    }
-  },
-  {
-    id: 2,
-    content: "I'm doing great! Just checking out the new font sizes and theme options. What do you think?",
-    isSent: true,
-    time: "10:31 AM",
-    sender: {
-      name: "You",
-      avatar: "/avatar-2.png"
-    }
-  },
-  {
-    id: 3,
-    content: "They look amazing! The readability is much better now. 👍",
-    isSent: false,
-    time: "10:32 AM",
-    sender: {
-      name: "Manish",
-      avatar: "/avatar-1.png"
-    }
-  }
+const THEME_OPTIONS = [
+  { id: "dark", label: "Dark", icon: Moon },
+  { id: "light", label: "Light", icon: Sun },
+  { id: "system", label: "System", icon: Monitor },
 ];
 
-const THEME_GROUPS = {
-  "Light Themes": ["light", "cupcake", "bumblebee", "emerald", "corporate", "lofi", "pastel", "wireframe", "lemonade"],
-  "Dark Themes": ["dark", "synthwave", "retro", "cyberpunk", "halloween", "forest", "black", "luxury", "dracula", "night", "coffee"],
-  "Colorful": ["valentine", "garden", "aqua", "fantasy", "cmyk", "autumn", "business", "acid", "winter"]
-};
+const ACCENT_COLORS = [
+  { id: "primary", color: "bg-[#00D2A0]", value: "166 100% 41%" },
+  { id: "blue", color: "bg-[#3B82F6]", value: "217 91% 60%" },
+  { id: "purple", color: "bg-[#8B5CF6]", value: "258 90% 66%" },
+  { id: "pink", color: "bg-[#EC4899]", value: "330 81% 60%" },
+  { id: "orange", color: "bg-[#F97316]", value: "25 95% 53%" },
+];
 
 const SettingsPage = () => {
-  const { theme, setTheme, fontSize, setFontSize } = useTheme();
+  const { theme, setTheme, fontSize, setFontSize, accentColor, setAccentColor } = useTheme();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-200/50 to-base-100 py-12">
-      <div className="container mx-auto px-4 max-w-5xl">
-        <div className="text-center mb-12 animate-fade-in">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <MessageSquare className="w-8 h-8 text-primary" />
-            <h1 className="text-4xl mt-15 font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              echoLine
-            </h1>
+    <div className="min-h-full bg-base-100 p-6 lg:p-10">
+      <div className="max-w-5xl mx-auto">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-1">App Settings</h1>
+            <p className="text-base-content/60 text-sm">Configure your StreamChat environment for peak performance.</p>
           </div>
-          <p className="text-base-content/70 text-lg">
-            Personalize your messaging experience
-          </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-[1fr,1.5fr]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* Left Column */}
           <div className="space-y-8">
-            <div className="card bg-base-100 shadow-xl animate-fade-in hover:shadow-2xl transition-all duration-300 overflow-hidden border border-base-200">
-              <div className="card-body">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-secondary"></div>
-                  </div>
-                  <h2 className="card-title m-0">Appearance</h2>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-medium">Theme</span>
-                    </label>
-                    <div className="grid grid-cols-3 gap-2 mb-4">
-                      {Object.entries(THEME_GROUPS).slice(0, 3).map(([groupName, themes]) => (
-                        <button
-                          key={themes[0]}
-                          className={`py-2 px-3 rounded-lg text-sm border transition-all ${themes.includes(theme)
-                            ? 'border-primary bg-primary/10 text-primary font-medium'
-                            : 'border-base-300 hover:border-base-content/30'
-                            }`}
-                          onClick={() => setTheme(themes[0])}
-                        >
-                          {groupName}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="relative">
-                      <select
-                        className="select select-bordered w-full bg-base-100 pr-10"
-                        value={theme}
-                        onChange={(e) => setTheme(e.target.value)}
+            
+            {/* Appearance */}
+            <div>
+              <div className="flex items-center gap-2 mb-4 text-base-content/80">
+                <PaletteIcon />
+                <h2 className="text-lg font-bold">Appearance</h2>
+              </div>
+              <div className="bg-base-200/50 p-6 rounded-2xl border border-base-300">
+                <h3 className="text-xs font-semibold tracking-wide text-base-content/60 uppercase mb-4">Theme Mode</h3>
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  {THEME_OPTIONS.map((opt) => {
+                    const Icon = opt.icon;
+                    const isActive = theme === opt.id || (opt.id === "system" && !["light", "dark"].includes(theme));
+                    return (
+                      <button
+                        key={opt.id}
+                        onClick={() => setTheme(opt.id)}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all ${
+                          isActive 
+                            ? "bg-base-100 border-primary text-primary shadow-sm" 
+                            : "bg-base-200/50 border-base-300 text-base-content/60 hover:bg-base-200"
+                        }`}
                       >
-                        {Object.entries(THEME_GROUPS).map(([groupName, themes]) => (
-                          <optgroup key={groupName} label={groupName}>
-                            {themes.map(themeName => (
-                              <option key={themeName} value={themeName}>
-                                {themeName.charAt(0).toUpperCase() + themeName.slice(1)}
-                              </option>
-                            ))}
-                          </optgroup>
-                        ))}
-                      </select>
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-medium">Text Size</span>
-                      <span className="label-text-alt">{fontSize}px</span>
-                    </label>
-                    <input
-                      type="range"
-                      min="12"
-                      max="24"
-                      value={fontSize}
-                      onChange={(e) => setFontSize(e.target.value)}
-                      className="range range-primary range-sm"
-                      step="1"
-                    />
-                    <div className="flex justify-between text-xs text-base-content/70 mt-1 px-1">
-                      <span>Small</span>
-                      <span>Medium</span>
-                      <span>Large</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* About Section */}
-            <div className="card bg-base-100 shadow-xl animate-fade-in hover:shadow-2xl transition-all duration-300 border border-base-200">
-              <div className="card-body">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5 text-primary" />
-                  </div>
-                  <h2 className="card-title m-0">About echoLine</h2>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4 p-4 rounded-lg bg-base-200/50">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-content">
-                      <MessageSquare className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold">echoLine</h3>
-                      <p className="text-sm text-base-content/70">Version 1.0.0</p>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-lg bg-base-200/50">
-                    <h3 className="font-bold mb-2">Created by</h3>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar">
-                        <div className="w-8 h-8 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                          <img
-                            src="/avatar-2.png"
-                            alt="Creator"
-                            onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=Manish`}
-                          />
-                        </div>
-                      </div>
-                      <p className="font-medium">Manish</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            <div className="card bg-base-100 shadow-xl animate-fade-in hover:shadow-2xl transition-all duration-300 border border-base-200 overflow-hidden">
-              <div className="card-body p-0">
-                <div className="p-4 border-b border-base-200 backdrop-blur-sm bg-base-100/90 sticky top-0 z-10">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="avatar online">
-                        <div className="w-10 h-10 rounded-full ring-2 ring-primary/30">
-                          <img
-                            src="/avatar-1.png"
-                            alt="Manish"
-                            onError={(e) => e.target.src = 'https://ui-avatars.com/api/?name=Manish'}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-medium" style={{ fontSize: `${Math.min(Math.max(parseInt(fontSize), 12), 24)}px` }}>Manish</h3>
-                        <div className="flex items-center gap-1 text-xs text-base-content/70">
-                          <span className="inline-block w-2 h-2 bg-success rounded-full"></span>
-                          <span>Online</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button className="btn btn-ghost btn-sm btn-circle">
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Messages */}
-                <div className="p-6 space-y-6 min-h-[400px] max-h-[400px] overflow-y-auto bg-base-200/30">
-                  {PREVIEW_MESSAGES.map((message, index) => (
-                    <div
-                      key={message.id}
-                      className={`flex items-end gap-2 ${message.isSent ? "justify-end" : "justify-start"} animate-fade-in`}
-                      style={{ animationDelay: `${index * 200}ms` }}
-                    >
-                      {!message.isSent && (
-                        <div className="avatar">
-                          <div className="w-8 h-8 rounded-full ring-2 ring-primary/20">
-                            <img
-                              src={message.sender.avatar}
-                              alt={message.sender.name}
-                              onError={(e) => e.target.src = `https://ui-avatars.com/api/?name=${message.sender.name}`}
-                            />
-                          </div>
-                        </div>
-                      )}
-                      <div className={`group max-w-[80%] space-y-1 ${message.isSent ? "items-end" : "items-start"}`}>
-                        <div
-                          className={`
-                            rounded-2xl px-4 py-3 shadow-sm transition-all
-                            ${message.isSent
-                              ? "bg-gradient-to-r from-primary to-primary text-primary-content rounded-br-none"
-                              : "bg-base-100 rounded-bl-none"
-                            }
-                          `}
-                          style={{ fontSize: `${Math.min(Math.max(parseInt(fontSize), 12), 24)}px` }}
-                        >
-                          {message.content}
-                        </div>
-                        <span className={`text-xs text-base-content/50 px-2 ${message.isSent ? "text-right" : "text-left"}`}>
-                          {message.time}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Input Area */}
-                <div className="p-4 border-t border-base-300 bg-base-100">
-                  <div className="flex items-center gap-2">
-                    <button className="btn btn-circle btn-ghost btn-sm bg-base-200/50">
-                      <Paperclip className="w-4 h-4" />
-                    </button>
-                    <div className="flex-1 relative">
-                      <Input
-                        type="text"
-                        placeholder="Type a message..."
-                        className="pr-10 rounded-full bg-base-200/50 focus:bg-base-200/80 transition-colors"
-                        style={{ fontSize: `${Math.min(Math.max(parseInt(fontSize), 12), 24)}px` }}
-                      />
-                      <button className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-circle btn-sm">
-                        <Smile className="w-4 h-4" />
+                        <Icon className="w-5 h-5" />
+                        <span className="text-xs font-medium">{opt.label}</span>
                       </button>
-                    </div>
-                    <button className="btn btn-primary btn-circle shadow-lg shadow-primary/20">
-                      <Send className="w-4 h-4" />
+                    );
+                  })}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <h3 className="text-xs font-semibold tracking-wide text-base-content/60 uppercase w-24">Accent Color</h3>
+                  <div className="flex items-center gap-2 flex-1">
+                    {ACCENT_COLORS.map((color, i) => (
+                      <button 
+                        key={color.id}
+                        onClick={() => setAccentColor(color.value)}
+                        className={`w-8 h-8 rounded-full ${color.color} flex items-center justify-center ${accentColor === color.value || (!accentColor && i === 0) ? "ring-2 ring-primary ring-offset-2 ring-offset-base-200" : "opacity-70 hover:opacity-100"}`}
+                      >
+                        {(accentColor === color.value || (!accentColor && i === 0)) && <CheckIcon />}
+                      </button>
+                    ))}
+                    <button 
+                      className="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center ml-2 border border-base-content/20 text-base-content/50 hover:bg-base-200"
+                      onClick={() => setAccentColor(null)}
+                      title="Reset Default"
+                    >
+                      <EditIcon />
                     </button>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Preview Note */}
-            <div className="card bg-base-100 shadow-md border border-base-200 p-4 rounded-lg">
-              <div className="flex items-start gap-3">
-                <div className="text-warning mt-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+            {/* Notifications */}
+            <div>
+              <div className="flex items-center gap-2 mb-4 text-base-content/80 mt-2">
+                <Bell className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-bold">Notifications</h2>
+              </div>
+              <div className="bg-base-200/50 p-2 rounded-2xl border border-base-300">
+                <div className="flex items-center justify-between p-4 border-b border-base-300/50">
+                   <div className="flex items-center gap-3">
+                      <MonitorSmartphone className="w-5 h-5 text-base-content/60" />
+                      <div>
+                        <h4 className="text-sm font-medium">Desktop Notifications</h4>
+                        <p className="text-xs text-base-content/60">Show alerts on your desktop</p>
+                      </div>
+                   </div>
+                   <input type="checkbox" className="toggle toggle-primary" defaultChecked />
                 </div>
-                <div>
-                  <h3 className="font-medium text-base-content">Preview Mode</h3>
-                  <p className="text-sm text-base-content/70">
-                    This is a live preview of your current settings. Changes are applied immediately so you can see how they look.
-                  </p>
+                <div className="flex items-center justify-between p-4">
+                   <div className="flex items-center gap-3">
+                      <VolumeIcon />
+                      <div>
+                        <h4 className="text-sm font-medium">Sound Effects</h4>
+                        <p className="text-xs text-base-content/60">Play sounds for new messages</p>
+                      </div>
+                   </div>
+                   <input type="checkbox" className="toggle toggle-primary" defaultChecked />
                 </div>
               </div>
             </div>
+
           </div>
+
+          {/* Right Column */}
+          <div className="space-y-8">
+            
+            {/* Accessibility */}
+            <div>
+              <div className="flex items-center gap-2 mb-4 text-base-content/80">
+                <AccessibilityIcon />
+                <h2 className="text-lg font-bold">Accessibility</h2>
+              </div>
+              <div className="bg-base-200/50 p-6 rounded-2xl border border-base-300">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xs font-semibold tracking-wide text-base-content/60 uppercase">Font Size</h3>
+                  <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded font-medium">{fontSize}px</span>
+                </div>
+                
+                <input
+                  type="range"
+                  min="12"
+                  max="24"
+                  value={fontSize}
+                  onChange={(e) => setFontSize(e.target.value)}
+                  className="range range-primary range-xs mb-2"
+                  step="1"
+                />
+                <div className="flex justify-between text-xs text-base-content/50 uppercase font-semibold tracking-wider">
+                  <span>Small</span>
+                  <span>Large</span>
+                </div>
+
+                <div className="mt-8 flex items-center justify-between">
+                  <h3 className="text-sm font-medium">High Contrast</h3>
+                  <input type="checkbox" className="toggle toggle-sm" />
+                </div>
+              </div>
+            </div>
+
+            {/* Storage & Data */}
+            <div>
+              <div className="flex items-center gap-2 mb-4 text-base-content/80 mt-2">
+                <HardDrive className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-bold">Storage & Data</h2>
+              </div>
+              <div className="bg-base-200/50 p-6 rounded-2xl border border-base-300">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="text-xs font-semibold tracking-wide text-base-content/60 uppercase mb-1">Cache Usage</h3>
+                    <p className="text-2xl font-bold">1.24 GB</p>
+                  </div>
+                  <button className="btn btn-sm btn-outline border-error text-error hover:bg-error hover:text-error-content hover:border-error">Clear Cache</button>
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="flex-1 bg-base-300/50 p-3 rounded-lg text-center">
+                    <p className="text-xs text-base-content/60 uppercase font-semibold mb-1">Media</p>
+                    <p className="font-bold">856 MB</p>
+                  </div>
+                  <div className="flex-1 bg-base-300/50 p-3 rounded-lg text-center">
+                    <p className="text-xs text-base-content/60 uppercase font-semibold mb-1">Messages</p>
+                    <p className="font-bold">42 MB</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Danger Zone */}
+            <div className="mt-8 pt-6 border-t border-base-200">
+               <div className="flex items-center justify-between">
+                 <div>
+                   <h3 className="text-error font-bold flex items-center gap-2 mb-1">
+                     <AlertCircleIcon />
+                     Danger Zone
+                   </h3>
+                   <p className="text-xs text-base-content/60">Irreversible actions for your account and data.</p>
+                 </div>
+                 <div className="flex gap-2">
+                   <button className="btn btn-sm btn-ghost text-error">Deactivate Account</button>
+                   <button className="btn btn-sm bg-error/10 text-error hover:bg-error hover:text-error-content border-none">Delete Everything</button>
+                 </div>
+               </div>
+            </div>
+            
+            {/* Actions */}
+            <div className="flex justify-end gap-3 mt-8">
+              <button className="btn btn-ghost hover:bg-base-200">Discard Changes</button>
+              <button className="btn btn-primary shadow-sm shadow-primary/20 text-primary-content px-6">Save Preferences</button>
+            </div>
+
+          </div>
+
         </div>
       </div>
     </div>
   );
 };
+
+// Custom icons that are smaller/specific
+const PaletteIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+);
+
+const AccessibilityIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1"/><path d="m5 8 3-3 5.5 3-2.36 3.5"/><path d="M4.24 14.5a5 5 0 0 0 6.88 6"/><path d="M13.76 17.5a5 5 0 0 0-6.88-6"/></svg>
+);
+
+const CheckIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white"><polyline points="20 6 9 17 4 12"/></svg>
+);
+
+const EditIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+);
+
+const VolumeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-base-content/60"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+);
+
+const AlertCircleIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+);
 
 export default SettingsPage;

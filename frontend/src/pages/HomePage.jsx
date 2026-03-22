@@ -44,33 +44,29 @@ function HomePage() {
   }, [selectedUser, selectedGroup]);
 
   return (
-    <div className='h-[calc(100vh-4rem)] mt-16'>
-      <div className='h-full bg-base-100'>
-        <div className='flex h-full'>
-          <Slidebar
-            isMobile={isMobile}
-            showBackButton={showBackButton}
-            onBack={handleBack}
-          />
+    <div className='h-full w-full bg-base-100 flex overflow-hidden'>
+      <Slidebar
+        isMobile={isMobile}
+        showBackButton={showBackButton}
+        onBack={handleBack}
+      />
 
-          {/* Desktop: Show content when something is selected */}
-          {!isMobile && (
-            <>
-              {!selectedUser && !selectedGroup && <NoChartSelected />}
-              {selectedUser && <ChartCotainer />}
-              {selectedGroup && <GroupChat onBack={handleBack} />}
-            </>
-          )}
-
-          {/* Mobile: Show content when something is selected, hide sidebar */}
-          {isMobile && (selectedUser || selectedGroup) && (
-            <>
-              {selectedUser && <ChartCotainer />}
-              {selectedGroup && <GroupChat onBack={handleBack} />}
-            </>
-          )}
+      {/* Desktop: Show content when something is selected */}
+      {!isMobile && (
+        <div className="flex-1 flex flex-col h-full overflow-hidden bg-base-100 relative">
+          {!selectedUser && !selectedGroup && <NoChartSelected />}
+          {selectedUser && <ChartCotainer />}
+          {selectedGroup && <GroupChat onBack={handleBack} />}
         </div>
-      </div>
+      )}
+
+      {/* Mobile: Show content when something is selected, hide sidebar */}
+      {isMobile && (selectedUser || selectedGroup) && (
+        <div className="flex-1 flex flex-col h-full overflow-hidden bg-base-100 relative z-10">
+          {selectedUser && <ChartCotainer />}
+          {selectedGroup && <GroupChat onBack={handleBack} />}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,7 +1,19 @@
 @import "tailwindcss";
 
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark, retro, cupcake, dracula, night, pastel, cyberpunk, business, synthwave, valentine, halloween, garden, forest, aqua, lofi, fantasy, wireframe, black, luxury, cmyk, autumn, acid, lemonade, coffee, winter, dim, nord, sunset;
+  themes: light --default, dracula, night, pastel, dark, cyberpunk, business, synthwave, valentine, halloween, garden, forest, aqua, lofi, fantasy, wireframe, black, luxury, cmyk, autumn, acid, lemonade, coffee, winter, dim, nord, sunset;
+}
+
+[data-theme="dark"] {
+  --p: 161 100% 41%; /* Primary #00D2A0 */
+  --pf: 161 100% 30%;
+  --pc: 0 0% 100%;
+  --b1: 216 16% 12%; /* Background #191B21 */
+  --b2: 216 16% 15%; /* Surface #21242C */
+  --b3: 216 16% 20%;
+  --bc: 0 0% 100%;
+  --n: 216 16% 8%;
+  --nc: 0 0% 80%;
 }
 
 /* Font Size System */

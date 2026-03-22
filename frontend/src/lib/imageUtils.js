@@ -8,9 +8,7 @@ export const getImageUrl = (imagePath) => {
   }
 
   // If it's a local path, prepend the API base URL
-  const baseURL = import.meta.env.MODE === "development"
-    ? "http://localhost:3000"
-    : "";
+  const baseURL = "http://localhost:3000";
 
   return `${baseURL}${imagePath}`;
 };

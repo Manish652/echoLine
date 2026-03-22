@@ -192,7 +192,7 @@ const MessageInput = ({ onSendMessage }) => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Type a message..."
-            className="pr-12"
+            className="pr-12 bg-base-200/50 border-transparent focus:border-primary shadow-sm rounded-full"
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
             <button
